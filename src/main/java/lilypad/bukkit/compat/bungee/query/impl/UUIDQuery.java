@@ -23,7 +23,7 @@ public class UUIDQuery implements Query {
 		ByteArrayOutputStream byteArrayOutput = new ByteArrayOutputStream();
 		DataOutput output = new DataOutputStream(byteArrayOutput);
 		output.writeUTF("UUID");
-		output.writeUTF(player.getUniqueId().toString());
+		output.writeUTF(player.getUniqueId().toString().replace("-", ""));
 		this.server.getMessenger().dispatchIncomingMessage(player, Constants.channel, byteArrayOutput.toByteArray());
 	}
 

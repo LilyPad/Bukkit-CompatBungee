@@ -151,7 +151,7 @@ public class NetMessageListener {
 				return;
 			}
 			try {
-				this.connect.request(new MessageRequest(event.getSender(), "lpCbUR", playerName + " " + player.getUniqueId().toString()));
+				this.connect.request(new MessageRequest(event.getSender(), "lpCbUR", playerName + " " + player.getUniqueId().toString().replace("-", "")));
 			} catch(UnsupportedEncodingException exception) {
 				// ignore
 			} catch(RequestException exception) {
