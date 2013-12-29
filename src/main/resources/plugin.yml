@@ -1,0 +1,10 @@
+name: LilyPad-CompatBungee
+version: ${build.number}
+description: LilyPad
+
+author: LilyPad
+website: http://www.lilypadmc.org/
+
+load: STARTUP
+main: ${main.class}
+depend: [LilyPad-Connect, ProtocolLib]
