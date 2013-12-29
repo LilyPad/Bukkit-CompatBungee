@@ -22,13 +22,13 @@ public class NetMessageListener {
 	private NetServerCache serverCache;
 	private Connect connect;
 	private Server server;
-	
+
 	public NetMessageListener(NetServerCache serverCache, Connect connect, Server server) {
 		this.serverCache = serverCache;
 		this.connect = connect;
 		this.server = server;
 	}
-	
+
 	@EventListener
 	public void onMessage(MessageEvent event) {
 		if(event.getChannel().equals("lpCbA")) {
@@ -72,11 +72,10 @@ public class NetMessageListener {
 			} catch(IOException exception) {
 				// ignore
 			}
-			Player player = null;
-			if(this.server.getOnlinePlayers().length != 0) {
-				player = this.server.getOnlinePlayers()[0];
+			if(this.server.getOnlinePlayers().length == 0) {
+				return;
 			}
-			this.server.getMessenger().dispatchIncomingMessage(player, Constants.channel, byteArrayOutput.toByteArray());
+			this.server.getMessenger().dispatchIncomingMessage(this.server.getOnlinePlayers()[0], Constants.channel, byteArrayOutput.toByteArray());
 		} else if(event.getChannel().equals("lpCbPC")) {
 			try {
 				this.connect.request(new MessageRequest(event.getSender(), "lpCbPCR", Integer.toString(this.server.getOnlinePlayers().length)));
@@ -101,11 +100,10 @@ public class NetMessageListener {
 			} catch(IOException exception) {
 				// ignore
 			}
-			Player player = null;
-			if(this.server.getOnlinePlayers().length != 0) {
-				player = this.server.getOnlinePlayers()[0];
+			if(this.server.getOnlinePlayers().length == 0) {
+				return;
 			}
-			this.server.getMessenger().dispatchIncomingMessage(player, Constants.channel, byteArrayOutput.toByteArray());
+			this.server.getMessenger().dispatchIncomingMessage(this.server.getOnlinePlayers()[0], Constants.channel, byteArrayOutput.toByteArray());
 		} else if(event.getChannel().equals("lpCbPL")) {
 			Player[] players = this.server.getOnlinePlayers();
 			String[] playerNames = new String[players.length];
@@ -119,7 +117,47 @@ public class NetMessageListener {
 			} catch(RequestException exception) {
 				// ignore
 			}
+		} else if(event.getChannel().equals("lpCbUR")) {
+			String message;
+			try {
+				message = event.getMessageAsString();
+			} catch(UnsupportedEncodingException exception) {
+				return;
+			}
+			String player = message.substring(0, message.indexOf(' '));
+			String uuid = message.substring(message.indexOf(' ') + 1);
+			ByteArrayOutputStream byteArrayOutput = new ByteArrayOutputStream();
+			DataOutput output = new DataOutputStream(byteArrayOutput);
+			try {
+				output.writeUTF("UUIDOther");
+				output.writeUTF(player);
+				output.writeUTF(uuid);
+			} catch(IOException exception) {
+				// ignore
+			}
+			if(this.server.getOnlinePlayers().length == 0) {
+				return;
+			}
+			this.server.getMessenger().dispatchIncomingMessage(this.server.getOnlinePlayers()[0], Constants.channel, byteArrayOutput.toByteArray());
+		} else if(event.getChannel().equals("lpCbU")) {
+			String playerName;
+			try {
+				playerName = event.getMessageAsString();
+			} catch(UnsupportedEncodingException exception) {
+				return;
+			}
+			Player player = this.server.getPlayer(playerName);
+			if(player == null) {
+				return;
+			}
+			try {
+				this.connect.request(new MessageRequest(event.getSender(), "lpCbUR", playerName + " " + player.getUniqueId().toString()));
+			} catch(UnsupportedEncodingException exception) {
+				// ignore
+			} catch(RequestException exception) {
+				// ignore
+			}
 		}
 	}
-	
+
 }

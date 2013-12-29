@@ -15,6 +15,8 @@ import lilypad.bukkit.compat.bungee.query.impl.IPQuery;
 import lilypad.bukkit.compat.bungee.query.impl.MessageQuery;
 import lilypad.bukkit.compat.bungee.query.impl.PlayerCountQuery;
 import lilypad.bukkit.compat.bungee.query.impl.PlayerListQuery;
+import lilypad.bukkit.compat.bungee.query.impl.UUIDOtherQuery;
+import lilypad.bukkit.compat.bungee.query.impl.UUIDQuery;
 import lilypad.bukkit.compat.bungee.util.Constants;
 import lilypad.client.connect.api.Connect;
 
@@ -38,10 +40,12 @@ public class BungeePlugin extends JavaPlugin {
 		queryLookupService.submit(new ForwardQuery(connect));
 		queryLookupService.submit(new GetServerQuery(connect, super.getServer()));
 		queryLookupService.submit(new GetServersQuery(serverCache, super.getServer()));
-		queryLookupService.submit(new IPQuery(connect, super.getServer()));
+		queryLookupService.submit(new IPQuery(super.getServer()));
 		queryLookupService.submit(new MessageQuery(connect));
 		queryLookupService.submit(new PlayerCountQuery(connect, super.getServer()));
 		queryLookupService.submit(new PlayerListQuery(connect, super.getServer()));
+		queryLookupService.submit(new UUIDQuery(super.getServer()));
+		queryLookupService.submit(new UUIDOtherQuery(connect));
 		super.getServer().getMessenger().registerOutgoingPluginChannel(this, Constants.channel);
 		super.getServer().getPluginManager().registerEvents(new QueryChannelListener(), this);
 		ProtocolLibrary.getProtocolManager().addPacketListener(new PacketToQueryIntercepter(this, queryLookupService));
