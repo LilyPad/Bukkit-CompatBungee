@@ -5,6 +5,9 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -37,10 +40,7 @@ public class NetMessageListener {
 			if(event.getSender().equals(this.connect.getSettings().getUsername())) {
 				return;
 			}
-			Player player = null;
-			if(this.server.getOnlinePlayers().length != 0) {
-				player = this.server.getOnlinePlayers()[0];
-			}
+			Player player =  this.server.getOnlinePlayers().stream().findFirst().orElse(null);
 			this.server.getMessenger().dispatchIncomingMessage(player, Constants.channel, event.getMessage());
 		} else if(event.getChannel().equals("lpCbMsg")) {
 			String message;
@@ -72,13 +72,13 @@ public class NetMessageListener {
 			} catch(IOException exception) {
 				// ignore
 			}
-			if(this.server.getOnlinePlayers().length == 0) {
+			if(this.server.getOnlinePlayers().isEmpty()) {
 				return;
 			}
-			this.server.getMessenger().dispatchIncomingMessage(this.server.getOnlinePlayers()[0], Constants.channel, byteArrayOutput.toByteArray());
+			this.server.getMessenger().dispatchIncomingMessage(this.server.getOnlinePlayers().stream().findFirst().get(), Constants.channel, byteArrayOutput.toByteArray());
 		} else if(event.getChannel().equals("lpCbPC")) {
 			try {
-				this.connect.request(new MessageRequest(event.getSender(), "lpCbPCR", Integer.toString(this.server.getOnlinePlayers().length)));
+				this.connect.request(new MessageRequest(event.getSender(), "lpCbPCR", Integer.toString(this.server.getOnlinePlayers().size())));
 			} catch(UnsupportedEncodingException exception) {
 				// ignore
 			} catch(RequestException exception) {
@@ -100,16 +100,13 @@ public class NetMessageListener {
 			} catch(IOException exception) {
 				// ignore
 			}
-			if(this.server.getOnlinePlayers().length == 0) {
+			if(this.server.getOnlinePlayers().isEmpty()) {
 				return;
 			}
-			this.server.getMessenger().dispatchIncomingMessage(this.server.getOnlinePlayers()[0], Constants.channel, byteArrayOutput.toByteArray());
+			this.server.getMessenger().dispatchIncomingMessage(this.server.getOnlinePlayers().stream().findFirst().get(), Constants.channel, byteArrayOutput.toByteArray());
 		} else if(event.getChannel().equals("lpCbPL")) {
-			Player[] players = this.server.getOnlinePlayers();
-			String[] playerNames = new String[players.length];
-			for(int i = 0; i < players.length; i++) {
-				playerNames[i] = players[i].getName();
-			}
+			List<String> playerNames = new ArrayList<>();
+			this.server.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
 			try {
 				this.connect.request(new MessageRequest(event.getSender(), "lpCbPLR", StringUtils.concat(playerNames, ", ")));
 			} catch(UnsupportedEncodingException exception) {
@@ -135,10 +132,10 @@ public class NetMessageListener {
 			} catch(IOException exception) {
 				// ignore
 			}
-			if(this.server.getOnlinePlayers().length == 0) {
+			if(this.server.getOnlinePlayers().isEmpty()) {
 				return;
 			}
-			this.server.getMessenger().dispatchIncomingMessage(this.server.getOnlinePlayers()[0], Constants.channel, byteArrayOutput.toByteArray());
+			this.server.getMessenger().dispatchIncomingMessage(this.server.getOnlinePlayers().stream().findFirst().get(), Constants.channel, byteArrayOutput.toByteArray());
 		} else if(event.getChannel().equals("lpCbU")) {
 			String playerName;
 			try {
